@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>최대근 ♥ 권함초롬 · 웨딩 플래너</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c1a17; --gold:#b08d4f; --gold-light:#cdb079;
+    --cream:#f7f3ec; --paper:#fbf9f4; --line:#e4dccd;
+    --shadow:rgba(60,48,28,.12); --ref:#9a917f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:
+      radial-gradient(circle at 20% 6%, #fdfbf6 0%, transparent 50%),
+      radial-gradient(circle at 85% 94%, #f4eede 0%, transparent 55%),
+      var(--cream);
+    color:var(--ink); font-family:'Nanum Myeongjo',serif; line-height:1.6;
+    padding:0 0 90px;
+  }
+  .frame{max-width:920px;margin:0 auto;padding:0 20px}
+
+  header{text-align:center;padding:68px 20px 30px;position:relative}
+  header::before{content:"❄";position:absolute;top:28px;left:50%;transform:translateX(-50%);color:var(--gold-light);font-size:24px}
+  .kicker{font-family:'Cormorant Garamond',serif;letter-spacing:.5em;text-transform:uppercase;font-size:12px;color:var(--gold);margin-bottom:22px;padding-left:.5em}
+  .names{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(40px,8vw,72px);line-height:1.05}
+  .amp{display:block;color:var(--gold);font-style:italic;font-size:.55em;margin:4px 0}
+  .date-line{margin-top:22px;font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.18em;color:#4a4339}
+  .rule{width:56px;height:1px;background:var(--gold);margin:22px auto;position:relative}
+  .rule::before,.rule::after{content:"";position:absolute;top:-2px;width:5px;height:5px;background:var(--gold);border-radius:50%}
+  .rule::before{left:-10px}.rule::after{right:-10px}
+
+  /* summary bar */
+  .summary{
+    background:var(--ink);color:var(--paper);border-radius:3px;
+    padding:32px 26px;margin:6px auto 14px;position:relative;overflow:hidden;
+    box-shadow:0 24px 50px -22px var(--shadow);
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;text-align:center;
+  }
+  .summary::after{content:"";position:absolute;inset:7px;border:1px solid rgba(205,176,121,.32);pointer-events:none}
+  .sm-item .lab{font-family:'Cormorant Garamond',serif;letter-spacing:.22em;text-transform:uppercase;font-size:10px;color:var(--gold-light);margin-bottom:8px}
+  .sm-item .val{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,4.5vw,34px);font-weight:600;color:#fff;line-height:1}
+  .sm-item .val small{font-size:.45em;color:#bfb6a4;margin-left:2px}
+  .sm-grand .val{color:var(--gold-light)}
+  @media(max-width:620px){.summary{grid-template-columns:1fr;gap:14px}}
+
+  .hint{text-align:center;font-style:italic;color:var(--ref);font-size:13px;margin-bottom:30px;font-family:'Cormorant Garamond',serif;letter-spacing:.04em}
+  .hint b{color:var(--gold);font-style:normal}
+
+  /* sections */
+  .sec{margin-bottom:26px;background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  .sec-h{display:flex;align-items:center;gap:12px;padding:14px 20px;background:linear-gradient(90deg,#efe7d7,#f6f0e2);border-bottom:1px solid var(--line)}
+  .sec-h .n{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);font-size:17px}
+  .sec-h h3{font-size:17px;font-weight:700;flex:1}
+  .sec-h .st{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse}
+  td{padding:11px 14px;border-bottom:1px solid #f0e9da;vertical-align:middle;font-size:14px}
+  tr:last-child td{border-bottom:none}
+  .lbl{width:38%}
+  .lbl .note{display:block;color:var(--ref);font-size:11px;font-style:italic;margin-top:2px;line-height:1.45}
+  .ctrl{width:30%;white-space:nowrap}
+  .amt{width:32%;text-align:right;font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;letter-spacing:.02em}
+
+  input.in{
+    width:84px;font-family:'Nanum Myeongjo',serif;font-size:13px;color:#9a6b16;
+    background:#fff7cc;border:1px solid var(--gold-light);border-radius:3px;
+    padding:5px 7px;text-align:right;outline:none;transition:.15s;
+  }
+  input.in:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,141,79,.15)}
+  .unit{color:var(--ref);font-size:12px;margin-left:3px}
+  .x{color:var(--ref);font-size:12px;margin:0 4px}
+
+  /* reference rows (식대) */
+  tr.ref td{background:#f4efe3}
+  tr.ref .lbl,tr.ref .amt{color:var(--ref);font-style:italic}
+  .badge{display:inline-block;font-size:10px;font-style:normal;background:var(--gold-light);color:#fff;border-radius:10px;padding:1px 8px;margin-right:6px;vertical-align:middle;letter-spacing:.05em}
+
+  .meal-sum td{background:#efe7d7;font-weight:700}
+  .meal-sum .amt{color:#6b4e1e;font-style:italic}
+
+  /* 혼수 커스텀 행 */
+  input.in-label{
+    width:100%;font-family:'Nanum Myeongjo',serif;font-size:14px;color:var(--ink);
+    background:#fff7cc;border:1px solid var(--gold-light);border-radius:3px;
+    padding:5px 8px;outline:none;transition:.15s;
+  }
+  input.in-label:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,141,79,.15)}
+  .btn-add{
+    display:flex;align-items:center;gap:8px;margin:10px 16px 14px;
+    background:none;border:1.5px dashed var(--gold-light);border-radius:3px;
+    color:var(--gold);font-family:'Nanum Myeongjo',serif;font-size:13px;
+    padding:9px 16px;cursor:pointer;width:calc(100% - 32px);justify-content:center;
+    transition:.15s;
+  }
+  .btn-add:hover{background:rgba(176,141,79,.07);border-color:var(--gold)}
+  .btn-del{
+    background:none;border:none;cursor:pointer;color:#c9b99a;font-size:16px;
+    line-height:1;padding:0 4px;transition:.15s;flex:none;
+  }
+  .btn-del:hover{color:#c0392b}
+
+
+  /* ── 비율 바 차트 ── */
+  .bar-chart{
+    background:var(--paper);border:1px solid var(--line);border-radius:3px;
+    padding:24px 24px 20px;margin-bottom:26px;
+  }
+  .bar-chart-title{
+    font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;
+    color:var(--ink);margin-bottom:4px;
+  }
+  .bar-chart-sub{font-size:12px;color:var(--ref);font-style:italic;margin-bottom:20px}
+  .bar-chart-sub b{color:var(--gold);font-style:normal;font-size:14px}
+
+  /* 가로 전체 스택 바 */
+  .stack-bar{
+    display:flex;height:36px;border-radius:4px;overflow:hidden;
+    margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);
+  }
+  .stack-seg{height:100%;transition:flex .4s ease;cursor:default;position:relative}
+  .stack-seg:hover::after{
+    content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
+    transform:translateX(-50%);background:rgba(28,26,23,.88);color:#fff;
+    font-size:11px;padding:4px 10px;border-radius:3px;white-space:nowrap;
+    font-family:'Nanum Myeongjo',serif;pointer-events:none;z-index:10;
+  }
+
+  /* 항목별 범례 행 */
+  .bar-rows{display:flex;flex-direction:column;gap:10px}
+  .bar-row{display:flex;align-items:center;gap:10px}
+  .bar-dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .bar-name{font-size:13px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar-track{flex:2;height:8px;background:#efe8db;border-radius:4px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+  .bar-pct{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;min-width:42px;text-align:right}
+  .bar-amt{font-size:12px;color:var(--ref);min-width:90px;text-align:right}
+
+  /* footnote */
+  footer{text-align:center;color:var(--ref);font-size:12px;letter-spacing:.08em;margin-top:24px;font-family:'Cormorant Garamond',serif}
+  .heart{color:var(--gold)}
+
+  /* ── 탭 네비게이션 ── */
+  .tab-nav{
+    display:flex;gap:0;margin:0 auto 0;
+    border:1px solid var(--line);border-radius:3px;overflow:hidden;
+    background:var(--paper);margin-bottom:24px;
+  }
+  .tab-btn{
+    flex:1;padding:13px 10px;font-family:'Nanum Myeongjo',serif;font-size:14px;font-weight:700;
+    background:none;border:none;cursor:pointer;color:var(--ref);
+    border-right:1px solid var(--line);transition:.18s;letter-spacing:.04em;
+  }
+  .tab-btn:last-child{border-right:none}
+  .tab-btn:hover{background:#f4ede0;color:var(--ink)}
+  .tab-btn.active{background:var(--ink);color:var(--gold-light);}
+
+  /* 탭 패널 */
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* 캘린더 래퍼 */
+  .cal-wrap{
+    background:var(--paper);border:1px solid var(--line);border-radius:3px;
+    overflow:hidden;padding:0;
+  }
+  .cal-wrap iframe{
+    display:block;width:100%;height:680px;border:none;
+  }
+  .cal-hint{
+    text-align:center;padding:14px 20px 18px;
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    color:var(--ref);font-size:13px;border-top:1px solid var(--line);
+    background:#f9f5ee;
+  }
+  .cal-hint a{color:var(--gold);text-decoration:none}
+  .cal-hint a:hover{text-decoration:underline}
+
+  /* ── 항목별 메모 ── */
+  .btn-note{
+    background:none;border:none;cursor:pointer;font-size:14px;
+    padding:2px 5px;border-radius:3px;transition:.15s;color:#c9b99a;
+    vertical-align:middle;line-height:1;
+  }
+  .btn-note:hover{color:var(--gold)}
+  .btn-note.has-note{color:var(--gold)}
+  tr.note-row td{
+    padding:0;border-bottom:1px solid #f0e9da;
+  }
+  .note-inner{
+    max-height:0;overflow:hidden;transition:max-height .3s ease, padding .3s ease;
+  }
+  .note-inner.open{max-height:200px;}
+  .note-inner textarea{
+    width:100%;font-family:'Nanum Myeongjo',serif;font-size:13px;color:var(--ink);
+    background:#fffdf5;border:none;border-top:1px dashed var(--gold-light);
+    padding:10px 14px;resize:vertical;min-height:60px;outline:none;
+    line-height:1.6;
+  }
+  .note-inner textarea::placeholder{color:#c9b99a;font-style:italic}
+  .note-inner textarea:focus{background:#fff9e6}
+
+  /* ── 전체 메모장 탭 ── */
+  .memo-wrap{
+    background:var(--paper);border:1px solid var(--line);border-radius:3px;
+    overflow:hidden;
+  }
+  .memo-header{
+    padding:18px 22px 14px;background:linear-gradient(90deg,#efe7d7,#f6f0e2);
+    border-bottom:1px solid var(--line);
+  }
+  .memo-header h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600}
+  .memo-header p{font-size:12px;color:var(--ref);font-style:italic;margin-top:3px}
+  .memo-composer{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-end}
+  .memo-who{display:flex;gap:8px;margin-bottom:8px}
+  .memo-who-btn{
+    padding:5px 14px;border-radius:20px;border:1.5px solid var(--line);
+    background:none;font-family:'Nanum Myeongjo',serif;font-size:12px;cursor:pointer;
+    transition:.15s;color:var(--ref);
+  }
+  .memo-who-btn.sel{border-color:var(--gold);background:var(--gold);color:#fff;font-weight:700}
+  .memo-box{flex:1}
+  .memo-box textarea{
+    width:100%;font-family:'Nanum Myeongjo',serif;font-size:14px;color:var(--ink);
+    background:#fffdf5;border:1px solid var(--line);border-radius:3px;
+    padding:10px 14px;resize:none;height:70px;outline:none;line-height:1.6;
+    transition:.15s;
+  }
+  .memo-box textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,141,79,.12)}
+  .memo-box textarea::placeholder{color:#c9b99a;font-style:italic}
+  .memo-send{
+    padding:10px 18px;background:var(--ink);color:var(--gold-light);
+    border:none;border-radius:3px;font-family:'Nanum Myeongjo',serif;
+    font-size:13px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .memo-send:hover{background:#2e2b26}
+  .memo-list{padding:18px;display:flex;flex-direction:column;gap:12px;max-height:500px;overflow-y:auto}
+  .memo-item{
+    background:#fff;border:1px solid var(--line);border-radius:4px;
+    padding:12px 16px;position:relative;
+  }
+  .memo-item.by-daeguen{border-left:3px solid #4A7FC1}
+  .memo-item.by-hamchorom{border-left:3px solid #C162A8}
+  .memo-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .memo-author{
+    font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;color:#fff;
+  }
+  .memo-author.by-daeguen{background:#4A7FC1}
+  .memo-author.by-hamchorom{background:#C162A8}
+  .memo-time{font-size:11px;color:var(--ref);font-style:italic}
+  .memo-text{font-size:14px;line-height:1.7;white-space:pre-wrap}
+  .memo-del{
+    position:absolute;top:10px;right:10px;background:none;border:none;
+    color:#d5c9b8;font-size:13px;cursor:pointer;transition:.15s;padding:2px 5px;
+  }
+  .memo-del:hover{color:#c0392b}
+  .memo-empty{text-align:center;padding:40px 20px;color:var(--ref);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:16px}
+</style>
+</head>
+<body>
+<div class="frame">
+  <header>
+    <div class="kicker">Our Wedding Planner</div>
+    <div class="names">최대근<span class="amp">&amp;</span>권함초롬</div>
+    <div class="date-line">2026 · 12 · 19 · SATURDAY</div>
+    <div class="rule"></div>
+  </header>
+
+  <!-- 탭 네비게이션 -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('calendar',this)">📅 캘린더</button>
+    <button class="tab-btn" onclick="switchTab('budget',this)">💰 예산</button>
+    <button class="tab-btn" onclick="switchTab('memo',this)">📝 메모</button>
+  </nav>
+
+  <!-- 캘린더 탭 (기본) -->
+  <div id="tab-calendar" class="tab-panel active">
+    <div class="cal-wrap">
+      <iframe
+        src="https://calendar.google.com/calendar/embed?src=35d77be2db59026c6c46bcfb6b6f6df981acee06e1b5c58c577120f5b37eca58%40group.calendar.google.com&ctz=Asia%2FSeoul&hl=ko&mode=MONTH&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&bgcolor=%23fbf9f4"
+        allowfullscreen>
+      </iframe>
+      <div class="cal-hint">
+        일정 추가는 <a href="https://calendar.google.com/calendar/r?cid=35d77be2db59026c6c46bcfb6b6f6df981acee06e1b5c58c577120f5b37eca58%40group.calendar.google.com" target="_blank">구글 캘린더 앱</a>에서 직접 해주세요 · 추가하면 여기에 자동 반영됩니다
+      </div>
+    </div>
+  </div>
+
+  <!-- 예산 탭 -->
+  <div id="tab-budget" class="tab-panel">
+    <div class="summary">
+      <div class="sm-item"><div class="lab">항목 합계 · 예비비 전</div><div class="val" id="sm-base">0<small>원</small></div></div>
+      <div class="sm-item sm-grand"><div class="lab">총합계 · 식대 별도</div><div class="val" id="sm-grand">0<small>원</small></div></div>
+      <div class="sm-item"><div class="lab">식대 포함 시</div><div class="val" id="sm-full">0<small>원</small></div></div>
+    </div>
+    <p class="hint"><b>노란 칸</b>의 숫자를 바꾸면 합계가 즉시 다시 계산됩니다 · 회색 줄(식대)은 총액에서 제외</p>
+    <div id="bar-chart"></div>
+    <div id="app"></div>
+  </div>
+
+
+  <!-- 메모 탭 -->
+  <div id="tab-memo" class="tab-panel">
+    <div class="memo-wrap">
+      <div class="memo-header">
+        <h3>📝 우리의 웨딩 메모장</h3>
+        <p>두 분이 함께 메모를 남겨보세요 · 항목을 넘나드는 내용이나 중요한 연락처, 결정 사항을 기록하세요</p>
+      </div>
+      <div class="memo-composer">
+        <div class="memo-box">
+          <div class="memo-who">
+            <button class="memo-who-btn sel" id="who-daeguen" onclick="selectWho('daeguen')">👨 최대근</button>
+            <button class="memo-who-btn" id="who-hamchorom" onclick="selectWho('hamchorom')">👩 권함초롬</button>
+          </div>
+          <textarea id="memo-input" placeholder="메모를 입력하세요... (Shift+Enter로 줄바꿈, Enter로 등록)"></textarea>
+        </div>
+        <button class="memo-send" onclick="addMemo()">등록</button>
+      </div>
+      <div class="memo-list" id="memo-list"></div>
+    </div>
+  </div>
+
+    <footer>Made with <span class="heart">♥</span> · 2026 Winter</footer>
+</div>
+
+<script>
+const won = n => Math.round(n).toLocaleString('ko-KR') + '원';
+
+// 모든 unit/qty 칸은 자동으로 편집 가능
+const data = [
+  {sec:"1. 예식 (홀 · 식대)", items:[
+    {id:'hall', label:'홀 대관료', note:'확정', unit:4930000},
+    {id:'adult', label:'식대 대인', note:'총액 제외 · 단가×인원', unit:79200, qty:250, ref:true},
+    {id:'child', label:'식대 소인', note:'총액 제외 · 단가×인원', unit:39600, qty:0, ref:true},
+    {id:'meal', label:'예상 식대 합계', note:'※ 총합계에 포함되지 않음 (별도 정산)', mealsum:true},
+  ]},
+  {sec:"2. 스드메", items:[
+    {label:'플로우 스튜디오 (촬영)', note:'원본+수정본 44만 포함', unit:1240000},
+    {label:'스튜디오 헬퍼', note:'예상', unit:250000},
+    {label:'스튜디오 드레스/예복 업그레이드', note:'옵션 55,000~220,000', unit:0},
+    {label:'드레스 — 시작 by 이명순', note:'기본금액, 추가금 없음', unit:1630000},
+    {label:'드레스 본식 헬퍼', unit:250000},
+    {label:'폐백/혼주 헬퍼', note:'예상', unit:50000},
+    {label:'메이크업 — 김청경헤어페이스', note:'신랑 포함·실장 직접·오전6시 Early비용 없음', unit:645000},
+    {label:'혼주 메이크업 (여혼주 추가)', note:'무료 2인 外 추가 2인 예정', unit:187000, qty:2},
+    {label:'혼주 메이크업 (남혼주 추가)', note:'남혼주 4인 추가 예정', unit:55000, qty:4},
+  ]},
+  {sec:"3. 예복", items:[
+    {label:'남자 예복 (맞춤 풀세트)', note:'한도 200만 / 상하의·셔츠·수제화·보타이·촬영용2벌·로퍼·acc 포함', unit:2000000},
+  ]},
+  {sec:"4. 예물", items:[
+    {label:'예물', note:'한도 250만 / 150~180만 선호 / 미정', unit:1650000},
+  ]},
+  {sec:"5. 혼주 한복 대여", items:[
+    {label:'어머님 한복 — 럭셔리 라인', note:'2인 / 가계약 중', unit:980000},
+    {label:'프리미엄 업그레이드', note:'1인당 10만', unit:100000, qty:0},
+    {label:'덧치마 추가', note:'1인당 10~20만 / 정계약 시 50% 할인 예정', unit:150000, qty:0},
+    {label:'남자 혼주 기성복 구매', note:'1인 / 단가 미정', unit:0, qty:1},
+    {label:'추가 혼주 한복 (미정)', note:'남혼주 3인 + 여혼주 2인 미정', unit:0},
+  ]},
+  {sec:"6. 본식 기록", items:[
+    {label:'본식 촬영 DVD', note:'예식홀 무료지원', unit:0},
+    {label:'본식 스냅 (아이폰 스냅)', note:'iwedding 제휴 60만−5만 할인 / 타업체 40만 / 미정', unit:550000},
+  ]},
+  {sec:"7. 청첩장 · 식권", items:[
+    {label:'청첩장 250매 — Dear deer', unit:230000},
+    {label:'모바일 청첩장', note:'무료', unit:0},
+    {label:'식권 제작', unit:50000},
+  ]},
+  {sec:"8. 기타 (부케 · 답례 · 축의대 · 축가)", items:[
+    {label:'부케', note:'한도 30만 / 미정', unit:300000},
+    {label:'주례', note:'한도 50만', unit:500000},
+    {label:'주선자 답례', note:'1인당 50만', unit:500000, qty:2},
+    {label:'축의대 (2인1조)', note:'1팀 40만, 최대 2팀 / 미정', unit:400000, qty:1},
+    {label:'축가 초대비용', note:'한도 30만 / 미정', unit:300000},
+  ]},
+  {sec:"9. 뷰티 · 신혼여행", items:[
+    {label:'피부 미용 관리', note:'최대 200만 예상', unit:0},
+    {label:'신혼여행', note:'미정 — 정해지면 입력', unit:0},
+  ]},
+  {sec:"10. 상견례", items:[
+    {label:'상견례 (식대 12인 + 선물)', note:'총비용 / 선물 미정 포함', unit:1000000},
+  ]},
+  {sec:"11. 혼수", items:[
+    {label:'가전 — 기본', note:'냉장고·세탁기·건조기·TV 등', unit:20000000},
+    {label:'가전 — 옵션 추가', note:'에어컨·식기세척기 등 미정', unit:0},
+    {label:'가구 — 기본', note:'침대·소파·식탁·수납장 등', unit:2000000},
+    {label:'가구 — 옵션 추가', note:'추가 가구 미정', unit:0},
+    {label:'주방 용품', note:'식기·조리도구·소형 주방가전 등', unit:2000000},
+    {label:'잡기 — 기본', note:'생활잡화·침구·청소용품 등', unit:1000000},
+    {label:'잡기 — 옵션 추가', note:'추가 잡기 미정', unit:0},
+  ], custom:true},
+];
+
+// 혼수 커스텀 항목 (동적 추가/삭제)
+let customItems = [];  // [{label, unit}]
+
+let contingencyRate = 0.10;
+
+function amountOf(it){
+  if(it.mealsum) return 0;
+  return (it.unit||0) * (it.qty===undefined ? 1 : it.qty);
+}
+
+function inp(si, ii, field, val, wide){
+  return `<input class="in" data-s="${si}" data-i="${ii}" data-f="${field}" value="${val}"${wide?' style="width:70px"':''}>`;
+}
+
+
+// 무지개 색상 팔레트 (섹션 수에 맞게)
+const PALETTE = [
+  '#E05C5C','#E8874A','#D4A843','#7BBF6A',
+  '#4AACB8','#4A7FC1','#7B62C1','#C162A8',
+  '#B06A6A','#5A9E72','#5B7FBF'
+];
+
+function renderBarChart(grand){
+  const el = document.getElementById('bar-chart');
+  if(!el) return;
+
+  // 각 섹션 소계 계산
+  const segs = data.map((s,si)=>{
+    const fixed = s.items.filter(it=>!it.ref&&!it.mealsum).reduce((a,it)=>a+amountOf(it),0);
+    const cust  = s.custom ? customItems.reduce((a,ci)=>a+(ci.unit||0),0) : 0;
+    return {name: s.sec.replace(/^\d+\.\s*/,''), amt: fixed+cust, color: PALETTE[si]||'#aaa'};
+  });
+
+  if(grand<=0){el.innerHTML=''; return;}
+
+  // 스택 바 세그먼트
+  const stackSegs = segs.map(sg=>{
+    const pct = grand>0 ? (sg.amt/grand*100) : 0;
+    return `<div class="stack-seg" style="flex:${sg.amt};background:${sg.color}"
+      data-tip="${sg.name}: ${pct.toFixed(1)}%"></div>`;
+  }).join('');
+
+  // 항목 행 (비율순 정렬)
+  const sorted = [...segs].sort((a,b)=>b.amt-a.amt);
+  const rows = sorted.map(sg=>{
+    const pct = (sg.amt/grand*100);
+    return `<div class="bar-row">
+      <div class="bar-dot" style="background:${sg.color}"></div>
+      <div class="bar-name">${sg.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sg.color}"></div></div>
+      <div class="bar-pct" style="color:${sg.color}">${pct.toFixed(1)}%</div>
+      <div class="bar-amt">${sg.amt.toLocaleString('ko-KR')}원</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="bar-chart">
+    <div class="bar-chart-title">항목별 비율</div>
+    <div class="bar-chart-sub">총합계 <b>${grand.toLocaleString('ko-KR')}원</b> 기준 (식대 별도 · 예비비 포함)</div>
+    <div class="stack-bar">${stackSegs}</div>
+    <div class="bar-rows">${rows}</div>
+  </div>`;
+}
+
+// ── 항목별 메모 저장소 ──────────────────────────────
+// key: "si-ii" → 메모 문자열
+const itemNotes = {};
+
+function toggleNote(key, btn){
+  const row = document.getElementById('note-row-'+key);
+  if(!row) return;
+  const inner = row.querySelector('.note-inner');
+  inner.classList.toggle('open');
+  if(inner.classList.contains('open')){
+    inner.querySelector('textarea').focus();
+  }
+}
+
+function saveItemNote(key, val){
+  itemNotes[key] = val;
+  // 버튼 색 업데이트
+  const btn = document.querySelector(`.btn-note[data-key="${key}"]`);
+  if(btn) btn.classList.toggle('has-note', val.trim().length > 0);
+}
+
+// ── 전체 메모장 ────────────────────────────────────
+let memos = []; // [{who, text, time}]
+let currentWho = 'daeguen';
+
+function selectWho(who){
+  currentWho = who;
+  document.getElementById('who-daeguen').classList.toggle('sel', who==='daeguen');
+  document.getElementById('who-hamchorom').classList.toggle('sel', who==='hamchorom');
+}
+
+function addMemo(){
+  const ta = document.getElementById('memo-input');
+  const text = ta.value.trim();
+  if(!text) return;
+  const now = new Date();
+  const timeStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  memos.unshift({who:currentWho, text, time:timeStr});
+  ta.value='';
+  renderMemos();
+}
+
+function deleteMemo(idx){
+  memos.splice(idx,1);
+  renderMemos();
+}
+
+function renderMemos(){
+  const list = document.getElementById('memo-list');
+  if(!list) return;
+  if(memos.length===0){
+    list.innerHTML='<div class="memo-empty">아직 메모가 없어요 · 첫 메모를 남겨보세요 🤍</div>';
+    return;
+  }
+  list.innerHTML = memos.map((m,i)=>`
+    <div class="memo-item by-${m.who}">
+      <div class="memo-meta">
+        <span class="memo-author by-${m.who}">${m.who==='daeguen'?'👨 최대근':'👩 권함초롬'}</span>
+        <span class="memo-time">${m.time}</span>
+      </div>
+      <div class="memo-text">${m.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <button class="memo-del" onclick="deleteMemo(${i})">✕</button>
+    </div>`).join('');
+}
+
+// Enter 키로 메모 등록 (Shift+Enter = 줄바꿈)
+document.addEventListener('DOMContentLoaded', ()=>{
+  const ta = document.getElementById('memo-input');
+  if(ta) ta.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); addMemo(); }
+  });
+  renderMemos();
+});
+
+function render(){
+  const app=document.getElementById('app');
+  app.innerHTML='';
+
+  data.forEach((s,si)=>{
+    const sec=document.createElement('div'); sec.className='sec';
+    let rows='';
+    s.items.forEach((it,ii)=>{
+      if(it.mealsum){
+        const adult=data[0].items.find(x=>x.id==='adult');
+        const child=data[0].items.find(x=>x.id==='child');
+        const meal=amountOf(adult)+amountOf(child);
+        rows+=`<tr class="meal-sum"><td class="lbl"><span class="badge">참조</span>${it.label}<span class="note">${it.note}</span></td><td class="ctrl"></td><td class="amt">${won(meal)}</td></tr>`;
+        return;
+      }
+      // 모든 칸 편집 가능
+      let ctrl = inp(si,ii,'unit',it.unit||0,false);
+      if(it.qty!==undefined){
+        ctrl += `<span class="x">×</span>` + inp(si,ii,'qty',it.qty,true) + `<span class="unit">명</span>`;
+      }
+      const cls=it.ref?'ref':'';
+      const badge=it.ref?'<span class="badge">참조</span>':'';
+      const nkey=`${si}-${ii}`;
+      const hasNote=itemNotes[nkey]&&itemNotes[nkey].trim().length>0;
+      const noteBtn=`<button class="btn-note${hasNote?' has-note':''}" data-key="${nkey}" onclick="toggleNote('${nkey}',this)" title="메모">📝</button>`;
+      const noteOpen=itemNotes[nkey]?'open':'';
+      rows+=`<tr class="${cls}"><td class="lbl">${badge}${it.label}${it.note?`<span class="note">${it.note}</span>`:''}</td><td class="ctrl">${ctrl}</td><td class="amt">${won(amountOf(it))} ${noteBtn}</td></tr>`;
+      rows+=`<tr class="note-row" id="note-row-${nkey}"><td colspan="3"><div class="note-inner ${noteOpen}"><textarea placeholder="이 항목에 대한 메모... (업체 연락처, 계약 조건, 날짜 등)" onchange="saveItemNote('${nkey}',this.value)">${itemNotes[nkey]||''}</textarea></div></td></tr>`;
+    });
+
+    // 혼수 커스텀 행 렌더
+    if(s.custom){
+      customItems.forEach((ci,ci_i)=>{
+        rows+=`<tr class="custom-row">
+          <td class="lbl"><input class="in-label" data-ci="${ci_i}" data-cf="label" value="${ci.label}" placeholder="항목명 입력"></td>
+          <td class="ctrl" style="display:flex;align-items:center;gap:6px">
+            <input class="in" data-ci="${ci_i}" data-cf="unit" value="${ci.unit}">
+            <button class="btn-del" data-ci="${ci_i}" title="삭제">✕</button>
+          </td>
+          <td class="amt">${won(ci.unit||0)}</td>
+        </tr>`;
+      });
+    }
+
+    const fixedSub=s.items.filter(it=>!it.ref&&!it.mealsum).reduce((a,it)=>a+amountOf(it),0);
+    const customSub=s.custom?customItems.reduce((a,ci)=>a+(ci.unit||0),0):0;
+    const sub=fixedSub+customSub;
+    sec.innerHTML=`<div class="sec-h"><span class="n">${si+1}.</span><h3>${s.sec.replace(/^\d+\.\s*/,'')}</h3><span class="st">${won(sub)}</span></div><table>${rows}</table>`;
+    // 혼수 섹션에 행 추가 버튼
+    if(s.custom){
+      const addBtn=document.createElement('button');
+      addBtn.className='btn-add';
+      addBtn.innerHTML='＋ 항목 추가';
+      addBtn.addEventListener('click',()=>{
+        customItems.push({label:'',unit:0});
+        render();
+        // 새 항목의 label input에 포커스
+        const inputs=document.querySelectorAll('.in-label');
+        if(inputs.length) inputs[inputs.length-1].focus();
+      });
+      sec.appendChild(addBtn);
+    }
+    app.appendChild(sec);
+  });
+
+  // 합계 블록
+  const base=data.flatMap(s=>s.items).filter(it=>!it.ref&&!it.mealsum).reduce((a,it)=>a+amountOf(it),0)+customItems.reduce((a,ci)=>a+(ci.unit||0),0);
+  const cont=Math.round(base*contingencyRate/10000)*10000;
+  const grand=base+cont;
+  const adult=data[0].items.find(x=>x.id==='adult');
+  const child=data[0].items.find(x=>x.id==='child');
+  const meal=amountOf(adult)+amountOf(child);
+
+  const ex=document.createElement('div'); ex.className='sec';
+  ex.innerHTML=`<table>
+    <tr><td class="lbl" style="font-weight:700">항목 합계 (예비비 전 · 식대 제외)</td><td class="ctrl"></td><td class="amt" style="color:#6b4e1e">${won(base)}</td></tr>
+    <tr><td class="lbl">예비비 (Contingency)<span class="note">항목 합계 × 비율 · 권장 10%</span></td>
+        <td class="ctrl"><input class="in" id="rate" style="width:62px" value="${contingencyRate*100}"><span class="unit">%</span></td>
+        <td class="amt">${won(cont)}</td></tr>
+  </table>`;
+  app.appendChild(ex);
+
+  renderBarChart(grand);
+  document.getElementById('sm-base').innerHTML=base.toLocaleString('ko-KR')+'<small>원</small>';
+  document.getElementById('sm-grand').innerHTML=grand.toLocaleString('ko-KR')+'<small>원</small>';
+  document.getElementById('sm-full').innerHTML=(grand+meal).toLocaleString('ko-KR')+'<small>원</small>';
+
+  // 이벤트 바인딩
+  app.querySelectorAll('input.in').forEach(inp=>{
+    if(inp.id==='rate'){
+      inp.addEventListener('input',e=>{
+        const v=parseFloat(e.target.value);
+        contingencyRate=isNaN(v)?0:v/100;
+        render(); refocus('rate');
+      }); return;
+    }
+    // 커스텀 항목 금액
+    if(inp.dataset.ci!==undefined && inp.dataset.cf==='unit'){
+      inp.addEventListener('input',e=>{
+        const ci=+e.target.dataset.ci;
+        const v=parseFloat(e.target.value.replace(/,/g,''));
+        customItems[ci].unit=isNaN(v)?0:v;
+        render(); refocusCustom(ci,'unit');
+      }); return;
+    }
+    inp.addEventListener('input',e=>{
+      const s=+e.target.dataset.s, i=+e.target.dataset.i, f=e.target.dataset.f;
+      const v=parseFloat(e.target.value.replace(/,/g,''));
+      data[s].items[i][f]=isNaN(v)?0:v;
+      render(); refocus(`[data-s="${s}"][data-i="${i}"][data-f="${f}"]`);
+    });
+  });
+
+  // 커스텀 항목 라벨 편집
+  app.querySelectorAll('input.in-label').forEach(inp=>{
+    inp.addEventListener('input',e=>{
+      const ci=+e.target.dataset.ci;
+      customItems[ci].label=e.target.value;
+      // 라벨은 리렌더 없이 값만 저장 (포커스 유지)
+    });
+  });
+
+  // 커스텀 항목 삭제
+  app.querySelectorAll('.btn-del').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const ci=+e.target.dataset.ci;
+      customItems.splice(ci,1);
+      render();
+    });
+  });
+}
+
+function refocus(sel){
+  const el=document.querySelector('input'+(sel.startsWith('[')?sel:'#'+sel));
+  if(el){const v=el.value; el.focus(); el.setSelectionRange(v.length,v.length);}
+}
+function refocusCustom(ci, field){
+  const el=document.querySelector(`input.in[data-ci="${ci}"][data-cf="${field}"]`);
+  if(el){const v=el.value; el.focus(); el.setSelectionRange(v.length,v.length);}
+}
+
+render();
+
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='memo') renderMemos();
+}
+</script>
+</body>
+</html>
