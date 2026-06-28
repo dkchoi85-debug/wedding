@@ -280,12 +280,46 @@
   }
   .memo-del:hover{color:#c0392b}
   .memo-empty{text-align:center;padding:40px 20px;color:var(--ref);font-style:italic;font-family:'Cormorant Garamond',serif;font-size:16px}
+
+  /* ── 로그인 화면 ── */
+  #login-screen{
+    position:fixed;inset:0;background:linear-gradient(135deg,#fff 60%,#fdf6ec);
+    display:flex;align-items:center;justify-content:center;z-index:9999;
+  }
+  .login-box{
+    background:#fff;border-radius:16px;padding:44px 32px 36px;
+    max-width:380px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.1);text-align:center;
+  }
+  .login-logo{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.4em;color:var(--gold);margin-bottom:10px}
+  .login-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--ink);margin-bottom:4px}
+  .login-sub{font-size:12px;color:var(--ref);margin-bottom:28px;font-style:italic}
+  .login-group{margin-bottom:14px;text-align:left}
+  .login-label{font-size:11px;color:var(--ref);display:block;margin-bottom:5px;letter-spacing:.04em}
+  .login-inp{
+    width:100%;border:1px solid var(--line);border-radius:8px;
+    padding:11px 14px;font-size:14px;font-family:'Nanum Gothic',sans-serif;
+    color:var(--ink);background:#fafafa;outline:none;transition:.15s;
+  }
+  .login-inp:focus{border-color:var(--gold);background:#fffdf5}
+  .login-btn{
+    width:100%;background:var(--ink);color:var(--gold-l);
+    font-family:'Nanum Gothic',sans-serif;font-size:14px;font-weight:700;
+    border:none;border-radius:10px;padding:14px;cursor:pointer;
+    letter-spacing:.06em;transition:.15s;margin-top:6px;
+  }
+  .login-btn:hover{opacity:.9}
+  .login-err{font-size:12px;color:#e24b4a;margin-top:10px;display:none}
+  .login-dday{
+    font-family:'Cormorant Garamond',serif;font-size:13px;
+    color:var(--ref);margin-top:20px;letter-spacing:.1em;
+  }
 </style>
 
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, push, remove, onValue, onChildAdded, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDRWAR9HCU0eMXSrMggHwdARi3bA4H8MUw",
@@ -299,6 +333,36 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
+
+// 로그인 상태 감지
+onAuthStateChanged(auth, user => {
+  if(user){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-wrap').style.display='block';
+    document.getElementById('login-err').style.display='none';
+    window._currentUser = user.email;
+  } else {
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app-wrap').style.display='none';
+  }
+});
+
+// 로그인
+window.fbLogin = async function(email, password){
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    const err = document.getElementById('login-err');
+    err.style.display='block';
+    err.textContent = '이메일 또는 비밀번호가 올바르지 않아요.';
+  }
+};
+
+// 로그아웃
+window.fbLogout = async function(){
+  await signOut(auth);
+};
 
 // ── 전체 메모 Real Time ──────────────────────────
 const memosRef = ref(db, 'memos');
@@ -348,6 +412,28 @@ if(indicator) { indicator.style.background='#4caf50'; indicator.title='Firebase 
 </script>
 </head>
 <body>
+
+<!-- ── 로그인 화면 ── -->
+<div id="login-screen" style="display:none">
+  <div class="login-box">
+    <div class="login-logo">Wedding Planner</div>
+    <div class="login-title">최대근 ♥ 권함초롬</div>
+    <div class="login-sub">로그인하고 우리만의 플래너를 열어보세요</div>
+    <div class="login-group">
+      <label class="login-label">이메일</label>
+      <input class="login-inp" id="login-email" type="email" placeholder="이메일 입력" autocomplete="email">
+    </div>
+    <div class="login-group">
+      <label class="login-label">비밀번호</label>
+      <input class="login-inp" id="login-pw" type="password" placeholder="비밀번호 입력"
+        onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <p class="login-err" id="login-err"></p>
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+    <div class="login-dday" id="login-dday">D-??? · 2026.12.19</div>
+  </div>
+</div>
+
 <div class="frame">
   <header>
     <div class="kicker">Our Wedding Planner</div>
@@ -692,6 +778,29 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
   renderMemos();
 });
+
+function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  if(!email||!pw){ 
+    const err=document.getElementById('login-err');
+    err.style.display='block'; err.textContent='이메일과 비밀번호를 입력해주세요.'; return;
+  }
+  const tryLogin=()=>{ if(window.fbLogin) window.fbLogin(email,pw); else setTimeout(tryLogin,200); };
+  tryLogin();
+}
+
+// 로그인 화면 D-Day
+(function(){
+  const wedding=new Date('2026-12-19T12:00:00+09:00');
+  function tick(){
+    const diff=wedding-new Date();
+    if(diff<=0){ document.getElementById('login-dday').textContent='D-DAY · 2026.12.19'; return; }
+    const d=Math.floor(diff/(1000*60*60*24));
+    document.getElementById('login-dday').textContent=`D-${d} · 2026.12.19`;
+  }
+  tick(); setInterval(tick,1000*60);
+})();
 
 function render(){
   const app=document.getElementById('app');
