@@ -313,6 +313,34 @@
     font-family:'Cormorant Garamond',serif;font-size:13px;
     color:var(--ref);margin-top:20px;letter-spacing:.1em;
   }
+
+  /* ── 예산 저장 버튼 ── */
+  .budget-save-bar{
+    position:sticky;top:0;z-index:100;
+    background:#fff;border-bottom:1px solid var(--line);
+    padding:10px 16px;display:flex;align-items:center;gap:10px;
+    margin:0 -16px 16px;
+  }
+  .btn-save-budget{
+    background:var(--ink);color:var(--gold-l);
+    font-family:'Nanum Gothic',sans-serif;font-size:13px;font-weight:700;
+    border:none;border-radius:8px;padding:9px 20px;cursor:pointer;transition:.2s;
+    display:flex;align-items:center;gap:6px;
+  }
+  .btn-save-budget:hover{opacity:.85}
+  .btn-save-budget:active{transform:scale(.97)}
+  .save-status{
+    font-size:12px;font-family:'Nanum Gothic',sans-serif;
+    color:var(--ref);transition:.3s;
+  }
+  .save-status.saved{color:#4caf50;font-weight:700}
+  .save-status.saving{color:var(--gold)}
+  .btn-load-budget{
+    background:none;border:1px solid var(--line);color:var(--ref);
+    font-family:'Nanum Gothic',sans-serif;font-size:12px;
+    border-radius:8px;padding:9px 14px;cursor:pointer;transition:.2s;margin-left:auto;
+  }
+  .btn-load-budget:hover{border-color:var(--gold);color:var(--gold)}
 </style>
 
 <!-- Firebase SDK -->
@@ -492,7 +520,11 @@ if(indicator) { indicator.style.background='#4caf50'; indicator.title='Firebase 
 
   <!-- 예산 탭 -->
   <div id="tab-budget" class="tab-panel">
-    <div class="summary">
+    <div class="budget-save-bar">
+      <button class="btn-save-budget" onclick="saveBudget()">&#128190; &#51200;&#51109;&#54616;&#44592;</button>
+      <span class="save-status" id="save-status">&#48320;&#44221;&#49324;&#54637;&#51060; &#51080;&#51004;&#47732; &#51200;&#51109;&#54644;&#51452;&#49464;&#50836;</span>
+      <button class="btn-load-budget" onclick="loadBudget()">&#8635; &#48520;&#47084;&#50724;&#44592;</button>
+    </div>class="summary">
       <div class="sm-item"><div class="lab">항목 합계 · 예비비 전</div><div class="val" id="sm-base">0<small>원</small></div></div>
       <div class="sm-item sm-grand"><div class="lab">총합계 · 식대 별도</div><div class="val" id="sm-grand">0<small>원</small></div></div>
       <div class="sm-item"><div class="lab">식대 포함 시</div><div class="val" id="sm-full">0<small>원</small></div></div>
@@ -822,6 +854,100 @@ function doLogin(){
   tick(); setInterval(tick,1000*60);
 })();
 
+// ── 예산 저장/불러오기 ──────────────────────────────
+function getBudgetSnapshot(){
+  return {
+    items: data.map(s=>s.items.map(it=>({unit:it.unit||0, qty:it.qty}))),
+    customItems: customItems,
+    contingencyRate: contingencyRate,
+    savedAt: new Date().toLocaleString('ko-KR')
+  };
+}
+
+function saveBudget(){
+  const status = document.getElementById('save-status');
+  status.className='save-status saving';
+  status.textContent='저장 중...';
+  const snapshot = getBudgetSnapshot();
+  const trySave=()=>{
+    if(window.fbSaveBudget){
+      window.fbSaveBudget(snapshot);
+      status.className='save-status saved';
+      status.textContent='✓ 저장됐어요! '+snapshot.savedAt;
+      setTimeout(()=>{
+        status.className='save-status';
+        status.textContent='저장 완료';
+      }, 4000);
+    } else {
+      setTimeout(trySave, 300);
+    }
+  };
+  trySave();
+}
+
+function loadBudget(){
+  const status = document.getElementById('save-status');
+  status.className='save-status saving';
+  status.textContent='불러오는 중...';
+  const tryLoad=()=>{
+    if(window.fbLoadBudget){
+      window.fbLoadBudget(saved=>{
+        if(saved && saved.items){
+          saved.items.forEach((secItems, si)=>{
+            if(!data[si]) return;
+            secItems.forEach((it, ii)=>{
+              if(!data[si].items[ii]) return;
+              if(it.unit !== undefined) data[si].items[ii].unit = it.unit;
+              if(it.qty !== undefined && data[si].items[ii].qty !== undefined) data[si].items[ii].qty = it.qty;
+            });
+          });
+          if(saved.customItems) customItems = Array.isArray(saved.customItems) ? saved.customItems : Object.values(saved.customItems);
+          if(saved.contingencyRate) contingencyRate = saved.contingencyRate;
+          render();
+          status.className='save-status saved';
+          status.textContent='✓ 불러오기 완료! ' + (saved.savedAt||'');
+          setTimeout(()=>{ status.className='save-status'; status.textContent='최근 저장: '+(saved.savedAt||''); }, 4000);
+        } else {
+          status.className='save-status';
+          status.textContent='저장된 데이터가 없어요';
+        }
+      });
+    } else {
+      setTimeout(tryLoad, 300);
+    }
+  };
+  tryLoad();
+}
+
+// 페이지 로드 시 자동으로 불러오기
+function autoLoadBudget(){
+  const tryAuto=()=>{
+    if(window.fbLoadBudget){
+      window.fbLoadBudget(saved=>{
+        if(saved && saved.items){
+          saved.items.forEach((secItems,si)=>{
+            if(!data[si]) return;
+            secItems.forEach((it,ii)=>{
+              if(!data[si].items[ii]) return;
+              if(it.unit!==undefined) data[si].items[ii].unit=it.unit;
+              if(it.qty!==undefined && data[si].items[ii].qty!==undefined) data[si].items[ii].qty=it.qty;
+            });
+          });
+          if(saved.customItems) customItems=Array.isArray(saved.customItems)?saved.customItems:Object.values(saved.customItems);
+          if(saved.contingencyRate) contingencyRate=saved.contingencyRate;
+          render();
+          const status=document.getElementById('save-status');
+          if(status){ status.className='save-status'; status.textContent='최근 저장: '+(saved.savedAt||''); }
+        }
+      });
+    } else {
+      setTimeout(tryAuto,300);
+    }
+  };
+  tryAuto();
+}
+
+
 function render(){
   const app=document.getElementById('app');
   app.innerHTML='';
@@ -1016,6 +1142,7 @@ function refocusCustom(ci, field){
 
 render();
 setupEvents();
+autoLoadBudget();
 
 function switchTab(name, btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
