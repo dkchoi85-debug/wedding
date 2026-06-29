@@ -466,6 +466,7 @@ if(indicator) { indicator.style.background='#4caf50'; indicator.title='Firebase 
   <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;margin-bottom:4px">
     <div id="fb-indicator" style="width:7px;height:7px;border-radius:50%;background:#ccc;transition:.3s" title="Firebase 연결 중..."></div>
     <span style="font-size:10px;color:var(--ref);font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:.18em">Real Time</span>
+    <button onclick="if(window.fbLogout)window.fbLogout()" style="background:none;border:1px solid #e0ddd8;border-radius:12px;font-size:11px;color:#9a917f;padding:3px 12px;cursor:pointer;font-family:'Nanum Gothic',sans-serif;transition:.15s" onmouseover="this.style.borderColor='#b08d4f';this.style.color='#b08d4f'" onmouseout="this.style.borderColor='#e0ddd8';this.style.color='#9a917f'">로그아웃</button>
   </div>
   </header>
 
