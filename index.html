@@ -462,7 +462,7 @@ if(indicator) { indicator.style.background='#4caf50'; indicator.title='Firebase 
 <body>
 
 <!-- ── 로그인 화면 ── -->
-<div id="login-screen" style="display:none">
+<div id="login-screen" style="display:flex">
   <div class="login-box">
     <div class="login-logo">Wedding Planner</div>
     <div class="login-title">최대근 ♥ 권함초롬</div>
@@ -482,6 +482,7 @@ if(indicator) { indicator.style.background='#4caf50'; indicator.title='Firebase 
   </div>
 </div>
 
+<div id="app-wrap" style="display:none">
 <div class="frame">
   <header>
     <div class="kicker">Our Wedding Planner</div>
@@ -1182,5 +1183,6 @@ function switchTab(name, btn){
   if(name==='memo') renderMemos();
 }
 </script>
+</div>
 </body>
 </html>
