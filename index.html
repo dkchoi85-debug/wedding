@@ -322,7 +322,7 @@
     margin:0 -16px 16px;
   }
   .btn-save-budget{
-    background:var(--ink);color:var(--gold-l);
+    background:var(--ink);color:#ffffff;
     font-family:'Nanum Gothic',sans-serif;font-size:13px;font-weight:700;
     border:none;border-radius:8px;padding:9px 20px;cursor:pointer;transition:.2s;
     display:flex;align-items:center;gap:6px;
@@ -520,18 +520,22 @@ if(indicator) { indicator.style.background='#4caf50'; indicator.title='Firebase 
 
   <!-- 예산 탭 -->
   <div id="tab-budget" class="tab-panel">
-    <div class="budget-save-bar">
-      <button class="btn-save-budget" onclick="saveBudget()">&#128190; &#51200;&#51109;&#54616;&#44592;</button>
-      <span class="save-status" id="save-status">&#48320;&#44221;&#49324;&#54637;&#51060; &#51080;&#51004;&#47732; &#51200;&#51109;&#54644;&#51452;&#49464;&#50836;</span>
-      <button class="btn-load-budget" onclick="loadBudget()">&#8635; &#48520;&#47084;&#50724;&#44592;</button>
-    </div>class="summary">
+    <div class="summary">
       <div class="sm-item"><div class="lab">항목 합계 · 예비비 전</div><div class="val" id="sm-base">0<small>원</small></div></div>
       <div class="sm-item sm-grand"><div class="lab">총합계 · 식대 별도</div><div class="val" id="sm-grand">0<small>원</small></div></div>
       <div class="sm-item"><div class="lab">식대 포함 시</div><div class="val" id="sm-full">0<small>원</small></div></div>
     </div>
     <p class="hint"><b>노란 칸</b>의 숫자를 바꾸면 합계가 즉시 다시 계산됩니다 · 회색 줄(식대)은 총액에서 제외</p>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <button class="btn-save-budget" onclick="saveBudget()" style="flex:1;padding:12px 20px;font-size:14px;font-weight:700;background:var(--ink);color:#ffffff;border:none;border-radius:8px;cursor:pointer;letter-spacing:.06em;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">💾 저장하기</button>
+      <span class="save-status" id="save-status" style="font-size:12px;color:var(--ref);font-family:'Nanum Gothic',sans-serif;white-space:nowrap"></span>
+    </div>
     <div id="bar-chart"></div>
     <div id="app"></div>
+  <div style="margin:0 16px 20px;display:flex;align-items:center;gap:12px">
+      <button onclick="saveBudget()" style="flex:1;padding:12px 20px;font-size:14px;font-weight:700;background:var(--ink);color:#ffffff;border:none;border-radius:8px;cursor:pointer;letter-spacing:.06em;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">💾 저장하기</button>
+      <span id="save-status-bottom" style="font-size:12px;color:var(--ref);font-family:'Nanum Gothic',sans-serif;white-space:nowrap"></span>
+    </div>
   </div>
 
 
@@ -874,6 +878,8 @@ function saveBudget(){
       window.fbSaveBudget(snapshot);
       status.className='save-status saved';
       status.textContent='✓ 저장됐어요! '+snapshot.savedAt;
+      const bot=document.getElementById('save-status-bottom');
+      if(bot){ bot.style.color='#4caf50'; bot.textContent='✓ 저장됐어요!'; setTimeout(()=>{ bot.textContent=''; }, 4000); }
       setTimeout(()=>{
         status.className='save-status';
         status.textContent='저장 완료';
