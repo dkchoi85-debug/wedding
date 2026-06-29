@@ -433,6 +433,17 @@ window.fbSaveItemNote = function(key, val) {
 };
 
 // 동기화 상태 표시
+// ── 예산 데이터 저장/불러오기 ──────────────────────
+window.fbSaveBudget = function(budgetData){
+  set(ref(db, 'budget'), budgetData);
+};
+
+window.fbLoadBudget = function(cb){
+  onValue(ref(db, 'budget'), snap=>{
+    if(snap.val()) cb(snap.val());
+  }, {onlyOnce: true});
+};
+
 window._fbReady = true;
 const indicator = document.getElementById('fb-indicator');
 if(indicator) { indicator.style.background='#4caf50'; indicator.title='Firebase 연결됨 ✓'; }
