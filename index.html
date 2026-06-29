@@ -665,8 +665,27 @@ function tickDday(){
   const now = new Date();
   const diff = WEDDING - now;
   if(diff <= 0){
-    const el = document.getElementById('dday-block');
-    if(el) el.innerHTML = '<div style="font-family:Cormorant Garamond,serif;font-size:42px;color:var(--gold);text-align:center">💍 D-DAY 💍</div>';
+    const past = Math.floor(Math.abs(diff)/(1000*60*60*24));
+    const kicker = document.querySelector('.kicker');
+    if(kicker && kicker.textContent.indexOf('유부') === -1){
+      kicker.textContent = '\u{1F48D} \uacb0\ud63c\ud588\uc5b4\uc694! \uc774\uc81c\ub294 \uc720\ubd80 \u{1F48D}';
+      kicker.style.letterSpacing = '.1em';
+    }
+    const ddEl = document.getElementById('dd-d');
+    const hhEl = document.getElementById('dd-h');
+    const mmEl = document.getElementById('dd-m');
+    const ssEl = document.getElementById('dd-s');
+    if(past === 0){
+      if(ddEl) ddEl.textContent = 'D-DAY';
+      if(hhEl) hhEl.textContent = '\u{1F48D}';
+      if(mmEl) mmEl.textContent = '\u{1F389}';
+      if(ssEl) ssEl.textContent = '\u{1F942}';
+    } else {
+      if(ddEl) ddEl.textContent = 'D+'+past;
+      if(hhEl) hhEl.textContent = '00';
+      if(mmEl) mmEl.textContent = '00';
+      if(ssEl) ssEl.textContent = '00';
+    }
     return;
   }
   const days = Math.floor(diff / (1000*60*60*24));
