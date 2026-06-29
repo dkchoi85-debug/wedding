@@ -364,17 +364,26 @@ const db = getDatabase(app);
 const auth = getAuth(app);
 
 // 로그인 상태 감지
-onAuthStateChanged(auth, user => {
+function handleAuth(user){
+  const ls = document.getElementById('login-screen');
+  const aw = document.getElementById('app-wrap');
+  const le = document.getElementById('login-err');
+  if(!ls || !aw){
+    // DOM 아직 준비 안 됨 — 잠시 뒤 재시도
+    setTimeout(()=>handleAuth(user), 100);
+    return;
+  }
   if(user){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app-wrap').style.display='block';
-    document.getElementById('login-err').style.display='none';
+    ls.style.display='none';
+    aw.style.display='block';
+    if(le) le.style.display='none';
     window._currentUser = user.email;
   } else {
-    document.getElementById('login-screen').style.display='flex';
-    document.getElementById('app-wrap').style.display='none';
+    ls.style.display='flex';
+    aw.style.display='none';
   }
-});
+}
+onAuthStateChanged(auth, handleAuth);
 
 // 로그인
 window.fbLogin = async function(email, password){
