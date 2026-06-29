@@ -881,8 +881,12 @@ function doLogin(){
 // ── 예산 저장/불러오기 ──────────────────────────────
 function getBudgetSnapshot(){
   return {
-    items: data.map(s=>s.items.map(it=>({unit:it.unit||0, qty:it.qty}))),
-    customItems: customItems,
+    items: data.map(s=>s.items.map(it=>{
+      const o = {unit: it.unit||0};
+      if(it.qty !== undefined) o.qty = it.qty;
+      return o;
+    })),
+    customItems: customItems.map(ci=>({label:ci.label||'', unit:ci.unit||0})),
     contingencyRate: contingencyRate,
     savedAt: new Date().toLocaleString('ko-KR')
   };
